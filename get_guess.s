@@ -13,4 +13,4 @@ sw	$a2,28($sp)	#save the *question ??
 
 
 
-jr	$ra	#return to guess_main
+jr	$ra		#return to guess_main

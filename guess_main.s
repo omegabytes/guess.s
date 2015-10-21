@@ -35,7 +35,7 @@ blt $s1,$s0,tooLow	#goto tooLow
 bgt $s1,$s0,tooHigh	#goto tooHigh
 
 #beq winCondition,winState (to be completed)
-b getGuess		#branch to getGuess
+b get_guess		#branch to getGuess
 
 tooLow:
 la $a0,hintLow		#load address of low hint string in prep for MessageDialog
@@ -49,9 +49,9 @@ winState:
 la $a0,winStatement	#load win message into $a0 in prep for function call
 jal MessageDialog	#jump to MessageDialog to display winStatement popup
 
-
-
 jr $ra			#return from main
 
 .include "./util.s"
 .include "./create_question.s"
+.include "./RandomIntRange.s"
+.include "./get_guess.s"
