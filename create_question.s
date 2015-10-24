@@ -34,39 +34,53 @@ create_question:
     sw  	$s0,16($sp)	#question
 #
 #  len1 = strlen(first);
-#  len2 = strlen(second);
-#  len3 = strlen(third);
-#  len = len1 + len2 + len3;
     la		$a0,promptOne	#load address of promptOne in prep for strlen()
     jal		strlen		#call strlen()
     sw		$v0,20($sp)	#store length of promptOne into $s1
-    
+   
+#  len2 = strlen(second);    
     move	$a1,$a0		#move max into $a0 in prep for strlen
     jal		strlen		#call strlen()
     sw		$v0,24($sp)	#store length of max value in $s2
-    
+
+#  len3 = strlen(third);       
     la		$a0,promptTwo	#load address of promptTwo in prep
     jal		strlen		#call strlen()
     sw		$v0,28($sp)	#save length of promptTwo into $s3
     
-    #are we concatenating all three lens into len? what is the purpose of this value?
+#  len = len1 + len2 + len3;
     add		$s4,$s3,$s2	#len = len3+len2
     add		$s4,$s4,$s1	#len = (len3+len2)+len1
 
 #  question = sbrk (len + 1);
-#  strcpy(question,first);
-#  strcpy(question+len1, second);
-#  strcpy(question+len1+len2,third);
-
     add		$a0,$s4,1	#$a0 = len + 1
     jal		sbrk		#call sbrk for len +1
-    move	$v0,$s0 	#move 
-
-
-
+    move	$s0,$v0 	#$s0 = question (= sbrk(len+1)) 
+    
+#  strcpy(question,first);    
+    move	$a0,$s0		#$a0 = question
+    lw		$a1,40($sp)	#$a1 = promptOne
+    jal		strcpy
+    move	$s0,$v0		#store question in $s0
+    
+#  strcpy(question+len1, second);
+    move	$a0,$s0		#$a0 = question
+    lw		$t0,20($sp)	#$t0 = len1
+    add		$a0,$a0,$t0	#$a0 = question+len1
+    lw		$a1,44($sp)	#$a1 = max (post-conversion)
+    jal		srtcpy		
+    move	$s0,$v0		#store question in $s0
+          
+#  strcpy(question+len1+len2,third);
+    move	$a0,$s0		#$a0 = question+len1
+    lw		$t0,24($sp)	#$t0 = len2
+    add		$a0,$a0,$t0	#$a0 = question+len1+len2
+    lw		$a1,48($sp)	#$a1 = promptTwo
+    jal		strcpy
+    sw		$v0,16($sp)	#store cat'd question in 16($sp) f
 
 #  return(question);
-    move 	$v0,$s0
+    #move 	$v0,$s0
     lw  	$s4,32($sp)
     lw  	$s3,28($sp)
     lw  	$s2,24($sp)

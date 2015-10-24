@@ -12,7 +12,6 @@ promptTwo:	.ascii 	". Enter your guess (q to quit)"
 offset:		.word 3312
 min: 		.word 1
 max: 		.word 10
-randomInt:	.word 0
 
 .text
 .globl main
@@ -23,6 +22,7 @@ sw	$a1,20($sp)		#int max
 sw 	$ra,124($sp)		#save return address
 
 sw	$s0,24($sp)		#concatenated question
+sw	$s1,28($sp)		#target number
 
 #convert max from integer to hex with itoax(int, *string)
 la	$a0,max			#pointer to max
@@ -35,31 +35,17 @@ sw	$v0,24($sp)		#save cat'd question
 
 #get the RandomIntRange
 jal 	RandomIntRange
-sw	$v0,randomInt		#store randomInt
+sw	$v0,28($sp)		#store target number
 
 #jump to get_guess
+lw	$a0,24($sp)		#$a0 = cat'd question
+lw	$a1,28($sp)		#$a1 = target number
 jal 	get_guess
-
-#add $s0,$t0,$zero		#store random generated number into $s0 for comparison
-beq 	$s1,$s0,winState	#if user input == chosen random, goto winState and exit
-blt 	$s1,$s0,tooLow		#goto tooLow
-bgt 	$s1,$s0,tooHigh		#goto tooHigh
 
 #beq winCondition,winState (to be completed)
 b 	get_guess		#branch to getGuess
 
-tooLow:
-la 	$a0,hintLow		#load address of low hint string in prep for MessageDialog
-jal 	MessageDialog		#display hint
-
-tooHigh:
-la 	$a0,hintHigh		#load address of high hint string in prep for MessageDialog
-jal 	MessageDialog		#display hint
-
-winState:
-la 	$a0,winStatement	#load win message into $a0 in prep for function call
-jal 	MessageDialog		#jump to MessageDialog to display winStatement popup
-
+exitMain:
 jr 	$ra			#return from main
 
 .include "./util.s"
