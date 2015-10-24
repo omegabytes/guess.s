@@ -11,16 +11,15 @@
 #
 #  char * create_question( char * first, char * second, char * third) {
 .data
-promptOne:	.ascii "Please enter a hexadecimal number between one and "
-promptTwo:	.ascii ". Enter your guess (q to quit)"
+
     .text
     .globl create_question
 create_question:
     addiu  	$sp,$sp,-40	#allocated stack space
-    sw  	$a0,40($sp)	#
-    sw  	$a1,44($sp)	#
-    sw  	$a2,48($sp)	#
-    sw  	$ra,36($sp)	#
+    sw  	$a0,40($sp)	#promptOne
+    sw  	$a1,44($sp)	#max (after itoax conversion
+    sw  	$a2,48($sp)	#promptTwo
+    sw  	$ra,36($sp)	#store return address
 #  int len1, len2, len3, len ;
 #  char * question;
     # question - s0
@@ -39,16 +38,15 @@ create_question:
 #  len3 = strlen(third);
 #  len = len1 + len2 + len3;
     la		$a0,promptOne	#load address of promptOne in prep for strlen()
-    #jal		strlen		#call strlen()
+    jal		strlen		#call strlen()
     sw		$v0,20($sp)	#store length of promptOne into $s1
     
-    #where is the max value? We need to load it and pass it to strlen() here before continuing
-    add		$a0,$zero,$a0	#I'm assuming max value will be in $a0
-    #jal		strlen		#call strlen()
+    move	$a1,$a0		#move max into $a0 in prep for strlen
+    jal		strlen		#call strlen()
     sw		$v0,24($sp)	#store length of max value in $s2
     
     la		$a0,promptTwo	#load address of promptTwo in prep
-    #jal		strlen		#call strlen()
+    jal		strlen		#call strlen()
     sw		$v0,28($sp)	#save length of promptTwo into $s3
     
     #are we concatenating all three lens into len? what is the purpose of this value?
@@ -61,8 +59,8 @@ create_question:
 #  strcpy(question+len1+len2,third);
 
     add		$a0,$s4,1	#$a0 = len + 1
-    jal		strcpy		#call strcpy for len +1
-    move	$t1,$v0		#move 
+    jal		sbrk		#call sbrk for len +1
+    move	$v0,$s0 	#move 
 
 
 

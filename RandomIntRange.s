@@ -8,17 +8,17 @@ sw	$a0,20($sp)	#offset
 sw	$a1,24($sp)	#low
 sw	$a3,28($sp)	#high
 
-#time()
-jal time	#$v0 now contains time
+#time()z
+jal 	time		#$v0 now contains time
 
 #srandom()
 #$v0 should already hold the seed
 lw	$t0,20($sp)	#load offset into $t0
-add	$v0,$v0,$t0	#add offset to time (in $v0)
-jal srandom
+add	$a0,$v0,$t0	#add offset to time (in $v0)
+jal 	srandom
 
 #random()
-jal random	#random number now in $v0
+jal 	random		#random number now in $v0
 
 lw	$t1,28($sp)	#load high from stack
 lw	$t2,24($sp)	#load low from stack
